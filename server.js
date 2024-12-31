@@ -31,9 +31,9 @@ app.use('/api/comments', commentRoutes);
 
 //Production
 // Serve React build in production
-app.use(express.static("./tiktok-clone/build"));
+app.use(express.static("./client/build"));
 app.get('*', (req, res) => {
-    res.sendFile(path.resolve(__dirname, 'tiktok-clone', 'build', 'index.html'));
+    res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
 });
 
 // Catch-all route for unmatched requests
