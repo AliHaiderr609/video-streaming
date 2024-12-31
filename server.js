@@ -31,8 +31,8 @@ app.use('/api/comments', commentRoutes);
 
 //Production
 // Serve React build in production
-app.use(express.static(path.join("./tiktok-clone/build")));
-app.get('/*', (req, res) => {
+app.use(express.static("./tiktok-clone/build"));
+app.get('*', (req, res) => {
     res.sendFile(path.resolve(__dirname, 'tiktok-clone', 'build', 'index.html'));
 });
 
