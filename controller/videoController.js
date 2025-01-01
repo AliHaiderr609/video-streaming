@@ -9,32 +9,32 @@ exports.uploadVideo = async (req, res) => {
     }
 
     const { title, hashtags } = req.body;
-    // Construct the video URL
-    const videoUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
-
+    const videoUrl = req.fileDetails.url;
     const video = await Video.create({
         title,
         hashtags,
          url: videoUrl
     });
-
-    res.status(201).json(video);
+    const responseDetails = {
+      video,
+      fileDetails: req.fileDetails 
+  };
+    res.status(201).json({success: true, message: "Video uploaded successfullly!", responseDetails});
 };
 
 // Get All Videos
 exports.getVideos = async (req, res) => {
     try {
         const videos = await Video.find();
-
         const videosWithComments = await Promise.all(
-            videos.map(async (video) => {
+            videos?.map(async (video) => {
                 const comments = await Comment.find({ videoId: video._id })
                     .populate('userId') 
                     .select('comment userId videoId');
                 return {
                     ...video._doc,
-                    url: `${req.protocol}://${req.get('host')}${video.url}`,
-                    comments: comments, // Attach comments to the video
+                    url: `${video.url}`,
+                    comments: comments, 
                 };
             })
         );
@@ -53,14 +53,14 @@ exports.getVideoDetails = async (req, res) => {
       // Use aggregation to get the video details along with the comments
       const video = await Video.aggregate([
         {
-          $match: { _id: mongoose.Types.ObjectId(videoId) } // Match the video by its ID
+          $match: { _id: mongoose.Types.ObjectId(videoId) } 
         },
         {
           $lookup: {
-            from: 'comments', // Name of the Comment collection
-            localField: '_id', // Local field in Video (foreign key)
-            foreignField: 'videoId', // Field in Comment that references Video
-            as: 'comments' // Alias for the resulting array of comments
+            from: 'comments',
+            localField: '_id', 
+            foreignField: 'videoId', 
+            as: 'comments' 
           }
         },
         {
@@ -68,7 +68,7 @@ exports.getVideoDetails = async (req, res) => {
             title: 1,
             url: 1,
             hashtags: 1,
-            comments: 1 // Only include necessary fields, including comments
+            comments: 1 
           }
         }
       ]);

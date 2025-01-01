@@ -3,6 +3,7 @@ import { addComment, getVideos } from "../services/api";
 import { Link, useNavigate } from "react-router-dom";
 import { FixedSizeList as List } from "react-window";
 import { toast } from "react-toastify";
+import Loader from "./Loader";
 
 // Utility function to filter classes
 function classNames(...classes) {
@@ -16,11 +17,15 @@ export default function UserDashboard() {
 
   useEffect(() => {
     const fetchVideos = async () => {
+      setLoading(true); 
       try {
         const { data } = await getVideos();
         setVideos(data);
       } catch (error) {
         toast.error("Failed to load videos");
+        setLoading(false);
+      } finally {
+        setLoading(false);
       }
     };
     fetchVideos();
@@ -31,7 +36,6 @@ export default function UserDashboard() {
       toast.error("Comment cannot be empty");
       return;
     }
-
     setLoading(true);
     try {
       const payload = { videoId, comment };
@@ -52,18 +56,13 @@ export default function UserDashboard() {
         )
       );
       toast.success("Comment added successfully!");
+      setLoading(false);
     } catch (error) {
       toast.error("Error adding comment:", error.message);
+      setLoading(false);
     } finally {
       setLoading(false);
     }
-  };
-
-  // Handle user sign-out
-  const handleSignOut = () => {
-    localStorage.removeItem("token");
-    navigate("/login");
-    toast.success("You have been signed out.");
   };
 
   // Render a single video item
@@ -129,6 +128,7 @@ export default function UserDashboard() {
 
   return (
     <div className="h-screen flex flex-col">
+      {loading && <Loader />}
       <header className="bg-white shadow">
         <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
           <h1 className="text-3xl font-bold tracking-tight text-gray-900">
@@ -142,7 +142,7 @@ export default function UserDashboard() {
             <List
               height={window.innerHeight - 160} 
               itemCount={videos?.length} 
-              itemSize={850} 
+              itemSize={900} 
               width="100%"
             >
               {renderVideo}

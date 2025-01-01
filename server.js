@@ -14,10 +14,20 @@ const PORT = process.env.PORT || 5000;
 app.use(bodyParser.json());
 var corsOptions = {
     origin: "*",
-    optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
+    optionsSuccessStatus: 200, 
   };
 app.use(cors(corsOptions));
 
+// async function uploadVideo(filePath, containerName) {
+//     const blobServiceClient = BlobServiceClient.fromConnectionString(connectionString);
+//     const containerClient = blobServiceClient.getContainerClient(containerName);
+    
+//     const blobName = path.basename(filePath);
+//     const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+    
+//     await blockBlobClient.uploadFile(filePath);
+//     console.log(`Uploaded ${blobName} to container ${containerName}`);
+// }
 // MongoDB Connection 
 mongoose.connect('mongodb+srv://alih65993:jIu8RujuwFfuxX2V@cluster0.xg0il.mongodb.net/',{
     useNewUrlParser: true,

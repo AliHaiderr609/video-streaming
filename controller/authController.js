@@ -52,7 +52,7 @@ exports.getProfile = async (req, res) => {
   
   exports.updateProfile = async (req, res) => {
     try {
-      const { username, email, password, avatarUrl, bio, location } = req.body;
+      const { username, email, password, bio, location } = req.body;
   
       const user = await User.findById(req.user.id);
       if (!user) {
@@ -66,21 +66,22 @@ exports.getProfile = async (req, res) => {
         const salt = await bcrypt.genSalt(10);
         user.password = await bcrypt.hash(password, salt);
       }
-  
-      if (req.file && req.file.filename) {
-        user.avatarUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
-      }
+      if (req.fileDetails && req.fileDetails.url) { 
+        user.avatarUrl = req.fileDetails.url; 
+    }
       if (bio) user.bio = bio.trim();
       if (location) user.location = location.trim();
       await user.save();
   
       res.status(200).json({
+        success: true,
         message: "Profile updated successfully",
         user: {
           id: user._id,
           username: user?.username,
           email: user?.email,
-          avatarUrl: `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`,
+          file: req.fileDetails,
+          avatarUrl:user.avatarUrl,
           bio: user?.bio,
           location: user?.location,
           role: user?.role,

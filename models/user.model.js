@@ -4,10 +4,10 @@ const userSchema = new mongoose.Schema({
     username: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    role: { type: String, default: 'user' },
-    avatarUrl: { type: String, default: '' }, 
-    bio: { type: String, default: '' }, 
-    location: { type: String, default: '' }, 
+    bio: { type: String },
+    location: { type: String },
+    avatarUrl: { type: String }, // Ensure this is a String
+    role: { type: String, enum: ['user', 'admin'], default: 'user' },
     createdAt: { type: Date, default: Date.now }, 
     updatedAt: { type: Date, default: Date.now }, 
 });

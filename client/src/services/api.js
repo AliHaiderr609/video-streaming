@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API = axios.create({ baseURL: "https://mern-stream-hjefg9e9cfa5fjhz.eastus-01.azurewebsites.net" });
+const API = axios.create({ baseURL:"https://mern-stream-hjefg9e9cfa5fjhz.eastus-01.azurewebsites.net" });
 
 API.interceptors.request.use((req) => {
     const token = localStorage.getItem("token");

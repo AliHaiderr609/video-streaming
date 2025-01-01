@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom"; // For accessing URL params
-import { getVideoDetails, addComment } from "../services/api"; // Assuming you have these functions
-import { toast } from "react-toastify"; // For showing toast notifications
+import { useParams } from "react-router-dom"; 
+import { getVideoDetails, addComment } from "../services/api"; 
+import { toast } from "react-toastify"; 
+import Loader from "./Loader";
 
 const VideoDetail = () => {
   const { id } = useParams(); 
@@ -9,15 +10,19 @@ const VideoDetail = () => {
   const [comment, setComment] = useState("");
   const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [fetchingVideo, setFetchingVideo] = useState(true); 
 
   useEffect(() => {
     const fetchVideoDetails = async () => {
+      setFetchingVideo(true);
       try {
         const { data } = await getVideoDetails(id);
         setVideo(data); 
         setComments(data?.comments || []); 
       } catch (error) {
         toast.error("Error fetching video details");
+      } finally {
+        setFetchingVideo(false); 
       }
     };
 
@@ -27,13 +32,13 @@ const VideoDetail = () => {
   // Handle submitting a new comment
   const handleCommentSubmit = async (e) => {
     e.preventDefault();
-    if (!comment) return; // Don't submit if comment is empty
+    if (!comment) return; 
 
     try {
       setLoading(true);
       const { data } = await addComment({ videoId: id, comment });
-      setComments((prevComments) => [...prevComments, data?.comment]); // Add new comment to the list
-      setComment(""); // Clear input field
+      setComments((prevComments) => [...prevComments, data?.comment]);
+      setComment(""); 
     } catch (error) {
       toast.error("Error adding comment");
     } finally {
@@ -41,7 +46,7 @@ const VideoDetail = () => {
     }
   };
 
-  if (!video) return <div>Loading...</div>;
+  if (fetchingVideo) return <Loader />;
 
   return (
     <div className="container mx-auto p-4">

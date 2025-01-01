@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { getUserProfile, updateUserProfile } from "../services/api";
 import { toast } from "react-toastify";
+import Loader from "./Loader";
 // import AvatarPlaceholder from "../assets/avatar-placeholder.png"; // Replace with your placeholder avatar image
 
 const Profile = () => {
@@ -19,13 +20,14 @@ const Profile = () => {
     password: "",
     bio: "",
     location: "",
-    avatarFile: null, // New state for avatar file
+    avatarFile: null, 
   });
-
-  const [avatarPreview, setAvatarPreview] = useState(""); // Preview for the uploaded avatar
+  const [loading, setLoading] = useState(false);
+  const [avatarPreview, setAvatarPreview] = useState("");
 
   useEffect(() => {
     const fetchProfile = async () => {
+      setLoading(true);
       try {
         const { data } = await getUserProfile();
         setProfile(data);
@@ -35,11 +37,15 @@ const Profile = () => {
           password: "",
           bio: data.bio || "",
           location: data.location || "",
-          avatarFile: null, // Reset avatar file
+          avatarFile: null,
         });
-        setAvatarPreview(data.avatarUrl); // Set the initial avatar preview
+        setAvatarPreview(data?.avatarUrl);
+        setLoading(false); 
       } catch (error) {
         toast.error("Error fetching profile data.");
+        setLoading(false); 
+      } finally {
+        setLoading(false); 
       }
     };
 
@@ -56,7 +62,7 @@ const Profile = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    setLoading(true); 
     // Prepare form data for submission
     const formDataToSubmit = new FormData();
     formDataToSubmit.append("username", formData.username);
@@ -64,7 +70,7 @@ const Profile = () => {
     if (formData.password) formDataToSubmit.append("password", formData.password);
     formDataToSubmit.append("bio", formData.bio);
     formDataToSubmit.append("location", formData.location);
-    if (formData.avatarFile) formDataToSubmit.append("avatarUrl", formData.avatarFile);
+    if (formData.avatarFile) formDataToSubmit.append("file", formData.avatarFile);
 
     try {
       await updateUserProfile(formDataToSubmit);
@@ -76,15 +82,20 @@ const Profile = () => {
         email: formData.email,
         bio: formData.bio,
         location: formData.location,
-        avatarUrl: avatarPreview, // Update avatar preview URL
+        avatarUrl: avatarPreview,
       }));
+      setLoading(false);
     } catch (error) {
       toast.error("Error updating profile.");
+      setLoading(false);
+    } finally {
+      setLoading(false); 
     }
   };
 
   return (
     <div className="container mx-auto p-8">
+      {loading && <Loader />}
       <h1 className="text-4xl font-extrabold text-center mb-8 text-gray-800">Profile</h1>
       <div className="bg-white shadow-lg rounded-lg p-8 max-w-2xl mx-auto">
         <div className="flex flex-col items-center mb-6">

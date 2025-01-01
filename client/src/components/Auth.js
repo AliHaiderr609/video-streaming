@@ -2,38 +2,47 @@ import React, { useState } from "react";
 import { signup, login } from "../services/api";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import Loader from "./Loader";
 
 const Auth = () => {
-  const [isSignup, setIsSignup] = useState(false);
-  const [formData, setFormData] = useState({ username: "", password: "", email: "", role: "user" });
   const navigate = useNavigate();
+  const [isSignup, setIsSignup] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({ username: "", password: "", email: "", role: "user" });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true)
     if (isSignup) {
       try {
         const userdata = await signup(formData);
         toast.success("User created. Now you can log in.");
         setIsSignup(false);
+        setLoading(false);
       } catch (error) {
         const errorMessage = error.response?.data?.message || "Error creating account.";
         toast.error(errorMessage); 
+        setLoading(false);
       }
     } else {
       try {
         const { data } = await login(formData);
         localStorage.setItem("token", data.token);
+        setLoading(false);
         navigate(data?.user?.role === "admin" ? "/admin" : "/dashboard");
       } catch (error) {
         const errorMessage = error.response?.data?.message || "Invalid credentials";
         toast.error(errorMessage); 
+        setLoading(false);
       }
     }
+    setLoading(false);
   };
   
 
   return (
     <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
+      {loading && <Loader />}
       <Link to="/" className="sm:mx-auto sm:w-full sm:max-w-sm">
         <img
           alt="Your Company"

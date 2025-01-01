@@ -3,15 +3,14 @@ import { addComment, getVideos } from "../services/api";
 import { Link, useNavigate } from "react-router-dom";
 import {
   Disclosure,
-  DisclosureButton,
-  DisclosurePanel,
   Menu,
   MenuButton,
   MenuItem,
   MenuItems,
 } from "@headlessui/react";
-import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { BellIcon } from "@heroicons/react/24/outline";
 import { toast } from "react-toastify";
+import Loader from "./Loader";
 
 const user = {
   name: "Tom Cook",
@@ -21,7 +20,7 @@ const user = {
 };
 const navigation = [
   { name: "Dashboard", href: "#", current: true },
-  { name: "Team", href: "#", current: false },
+  { name: "Feed", href: "/list", current: false },
   { name: "Projects", href: "#", current: false },
   { name: "Calendar", href: "#", current: false },
   { name: "Reports", href: "#", current: false },
@@ -44,8 +43,16 @@ export default function UserDashboard() {
 
   useEffect(() => {
     const fetchVideos = async () => {
-      const { data } = await getVideos();
-      setVideos(data);
+      setLoading(true);
+      try {
+        const { data } = await getVideos();
+        setVideos(data);
+      } catch (error) {
+        toast.error("Error fetching videos:", error.message);
+        setLoading(false);
+      } finally {
+        setLoading(false); 
+      }
     };
 
     fetchVideos();
@@ -74,8 +81,10 @@ export default function UserDashboard() {
         )
       );
       toast.success("Comment added successfully!");
+      setLoading(false);
     } catch (error) {
       toast.error("Error adding comment:", error.message);
+      setLoading(false);
     } finally {
       setLoading(false);
     }
@@ -94,6 +103,7 @@ export default function UserDashboard() {
   );
   return (
     <>
+      {loading && <Loader />}
       <div className="min-h-full">
         <Disclosure as="nav" className="bg-gray-800">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">

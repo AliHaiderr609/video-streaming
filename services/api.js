@@ -1,13 +1,20 @@
 const multer = require('multer');
 const path = require('path');
 const jwt = require('jsonwebtoken');
+// const { BlobServiceClient } = require('@azure/storage-blob');
+// const connectionString =  process.env.AZURE_STORAGE_CONNECTION_STRING;
+// const containerName = process.env.CONTAINER_NAME;
+// const blobServiceClient = BlobServiceClient.fromConnectionString(connectionString);
+// const containerClient = blobServiceClient.getContainerClient(containerName);
 
+
+const upload = multer();
 // Multer for video uploads
-const storage = multer.diskStorage({
-    destination: './uploads',
-    filename: (req, file, cb) => cb(null, Date.now() + path.extname(file.originalname))
-});
-const upload = multer({ storage });
+// const storage = multer.diskStorage({
+//     destination: './uploads',
+//     filename: (req, file, cb) => cb(null, Date.now() + path.extname(file.originalname))
+// });
+// const upload = multer({ storage });
 
 // Authentication middleware
 const SECRET = "supersecretkey";
